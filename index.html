@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>我的GIF相册</title>
+    <style>
+        body {
+            font-family: -apple-system, "PingFang SC";
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .toc {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .gif-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px }
+            .gif-box { margin: 15px 0 }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎉 我的动态图库</h1>
+    <div class="toc">
+        <h2>📑 快速导航</h2>
+        <a href="#gif1">实验现象1</a>
+        <a href="#gif2">物理演示2</a>
+    </div>
+    <div class="gif-box" id="gif1">
+        <h2>实验现象1</h2>
+        <img src="gifs/exp1.gif" alt="实验动画">
+    </div>
+    <div class="gif-box" id="gif2">
+        <h2>物理演示2</h2>
+        <img src="gifs/phy2.gif" alt="物理过程">
+    </div>
+</body>
+</html>
