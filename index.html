@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧座舱交互系统</title>
+    <title>智能座舱交互全流程演示</title>
     <style>
         /* 基础样式 */
         * {
@@ -14,125 +14,69 @@
         }
 
         body {
-            background: #000;
+            background: #0a0a0a;
             color: #fff;
-            overflow-x: hidden;
         }
 
-        /* 封面页增强效果 */
-        .cover-page {
+        /* 封面页 */
+        .hero {
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle at center, #001529 0%, #000 100%);
-            position: relative;
+            background: radial-gradient(ellipse at center, #001529 0%, #000 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .title {
-            font-size: 3.5rem;
+            font-size: 2.8rem;
             text-align: center;
             margin-bottom: 2rem;
-            background: linear-gradient(90deg, #007AFF, #00C7FF);
+            background: linear-gradient(45deg, #007AFF, #00C7FF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 122, 255, 0.3);
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* 瀑布流容器 */
+        .grid-container {
+            columns: 4 300px;
+            column-gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
-        .scroll-down {
-            width: 30px;
-            height: 50px;
-            border: 2px solid #007AFF;
-            border-radius: 15px;
-            position: relative;
-            animation: bounce 2s infinite;
-        }
-
-        .scroll-down::before {
-            content: '';
-            width: 4px;
-            height: 10px;
-            background: #007AFF;
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 2px;
-        }
-
-        /* 导航栏优化 */
-        .nav-container {
-            width: 220px;
-            background: #000;
-            padding: 40px 20px;
-            position: fixed;
-            height: 100vh;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item {
-            color: #fff;
-            padding: 16px;
-            margin: 12px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            left: -100%;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.2));
-            transition: 0.3s;
-        }
-
-        .nav-item:hover::before {
-            left: 100%;
-        }
-
-        .nav-item.active {
-            background: rgba(0, 122, 255, 0.1);
-            box-shadow: inset 0 0 15px rgba(0, 122, 255, 0.2);
-        }
-
-        /* 内容展示优化 */
-        .content-container {
-            margin-left: 220px;
-            padding: 40px;
-        }
-
-        .gif-wall {
-            columns: 3;
-            column-gap: 30px;
-        }
-
+        /* GIF卡片 */
         .gif-card {
             break-inside: avoid;
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem;
             border-radius: 12px;
             overflow: hidden;
-            background: #0A0A0A;
+            background: #1a1a1a;
             transition: transform 0.3s;
+            cursor: pointer;
             position: relative;
         }
 
         .gif-card:hover {
             transform: translateY(-5px);
+        }
+
+        .gif-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .gif-card:hover::before {
+            border-color: #007AFF;
         }
 
         .gif-card img {
@@ -142,95 +86,94 @@
         }
 
         .gif-info {
-            padding: 16px;
+            padding: 1rem;
         }
 
         .gif-number {
             color: #007AFF;
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
 
         .gif-title {
-            font-size: 16px;
+            font-size: 1.1rem;
             line-height: 1.4;
         }
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-20px); }
-            60% { transform: translateY(-10px); }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+                padding: 0 1rem;
+            }
+            
+            .grid-container {
+                columns: 2;
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- 封面页 -->
-    <section class="cover-page">
+    <section class="hero">
         <h1 class="title">基于感性工学和语音驱动的<br>智慧座舱交互图形设计</h1>
-        <div class="scroll-indicator">
-            <div class="scroll-down" onclick="scrollToContent()"></div>
-        </div>
     </section>
 
-    <!-- 内容页 -->
-    <div class="content-page">
-        <!-- 导航栏 -->
-        <nav class="nav-container">
-            <div class="nav-item active" onclick="switchContent(0)">主交互流程</div>
-            <div class="nav-item" onclick="switchContent(1)">状态管理</div>
-            <div class="nav-item" onclick="switchContent(2)">多媒体控制</div>
-            <div class="nav-item" onclick="switchContent(3)">环境交互</div>
-        </nav>
-
-        <!-- 内容区 -->
-        <main class="content-container">
-            <!-- 主交互流程 -->
-            <section class="content-section active">
-                <div class="gif-wall" id="main-process"></div>
-            </section>
-
-            <!-- 其他内容区... -->
-        </main>
-    </div>
+    <!-- 瀑布流展示区 -->
+    <main class="grid-container" id="gifContainer"></main>
 
     <script>
-        // 动态加载配置
-        const gifConfig = {
-            categories: [
-                {
-                    title: "主交互流程",
-                    items: [
-                        { file: "1-zhushijue.gif", title: "主动视觉引导系统" },
-                        { file: "2-xiumian.gif", title: "疲劳检测模式" },
-                        { file: "3-4-lingting.gif", title: "语音唤醒状态" }
-                    ]
-                },
-                // 其他分类数据...
-            ]
-        };
+        // GIF数据配置（按实际文件名修改）
+        const gifFiles = [
+            { file: "1-zhushijue.gif", title: "主动视觉引导" },
+            { file: "2-xiumian.gif", title: "疲劳检测模式" },
+            { file: "3-4-lingting.gif", title: "语音唤醒状态" },
+            { file: "5-6-sikao.gif", title: "决策思考状态" },
+            { file: "7-10-jieguo.gif", title: "方案生成展示" },
+            { file: "11-xiumian.gif", title: "深度休息模式" },
+            { file: "12-14-daohang.gif", title: "AR导航系统" },
+            { file: "15-17-meiti.gif", title: "媒体中心控制" },
+            { file: "18-19-kongzhi.gif", title: "手势控制系统" },
+            { file: "20-23-tianqi.gif", title: "天气感知交互" },
+            { file: "24-27-changing.gif", title: "环境光自适应" },
+            { file: "28-31-biaooing.gif", title: "表情反馈系统" }
+        ];
+
+        // 排序函数：提取文件名中的首个数字
+        function getSortNumber(filename) {
+            const match = filename.match(/^(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+        }
 
         // 生成GIF卡片
-        function createGifCard(item, index) {
-            return `
-                <div class="gif-card">
-                    <img src="gifs/${item.file}" alt="${item.title}">
-                    <div class="gif-info">
-                        <div class="gif-number">交互节点 ${index + 1}</div>
-                        <div class="gif-title">${item.title}</div>
-                    </div>
+        function createGifCard(item) {
+            const card = document.createElement('div');
+            card.className = 'gif-card';
+            card.innerHTML = `
+                <img src="gifs/${item.file}" alt="${item.title}">
+                <div class="gif-info">
+                    <div class="gif-number">交互节点 ${getSortNumber(item.file)}</div>
+                    <div class="gif-title">${item.title}</div>
                 </div>
             `;
+            return card;
         }
 
         // 初始化加载
         window.onload = () => {
-            const container = document.getElementById('main-process');
-            container.innerHTML = gifConfig.categories[0].items
-                .map((item, index) => createGifCard(item, index))
-                .join('');
-        }
+            const container = document.getElementById('gifContainer');
+            
+            // 按数字排序
+            const sortedGifs = gifFiles.sort((a, b) => 
+                getSortNumber(a.file) - getSortNumber(b.file)
+            );
 
-        // 保持之前的交互函数...
+            // 批量创建卡片
+            sortedGifs.forEach(item => {
+                container.appendChild(createGifCard(item));
+            });
+        }
     </script>
 </body>
 </html>
