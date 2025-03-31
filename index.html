@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能座舱交互全流程演示</title>
+    <style>
+        /* 基础样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        /* 封面页 */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse at center, #001529 0%, #000 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .title {
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #007AFF, #00C7FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 瀑布流容器 */
+        .grid-container {
+            columns: 4 300px;
+            column-gap: 1.5rem;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* GIF卡片 */
+        .gif-card {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1a1a1a;
+            transition: transform 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gif-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .gif-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: border-color 0.3s;
+        }
+
+        .gif-card:hover::before {
+            border-color: #007AFF;
+        }
+
+        .gif-card img {
+            width: 100%;
+            height: auto;
+            border-bottom: 2px solid #007AFF;
+        }
+
+        .gif-info {
+            padding: 1rem;
+        }
+
+        .gif-number {
+            color: #007AFF;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .gif-title {
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+                padding: 0 1rem;
+            }
+            
+            .grid-container {
+                columns: 2;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 封面页 -->
+    <section class="hero">
+        <h1 class="title">基于感性工学和语音驱动的<br>智慧座舱交互图形设计</h1>
+    </section>
+
+    <!-- 瀑布流展示区 -->
+    <main class="grid-container" id="gifContainer"></main>
+
+    <script>
+        // GIF数据配置（按实际文件名修改）
+        const gifFiles = [
+            { file: "1.gif", title: "主动视觉引导" },
+            { file: "2.gif", title: "疲劳检测模式" },
+            { file: "3-4.gif", title: "语音唤醒状态" },
+            { file: "5-6.gif", title: "决策思考状态" },
+            { file: "7-10.gif", title: "方案生成展示" },
+            { file: "11.gif", title: "深度休息模式" },
+            { file: "12-14.gif", title: "AR导航系统" },
+            { file: "15-17.gif", title: "媒体中心控制" },
+            { file: "18-19.gif", title: "手势控制系统" },
+            { file: "20-23.gif", title: "天气感知交互" },
+            { file: "24-27.gif", title: "环境光自适应" },
+            { file: "28-31.gif", title: "表情反馈系统" }
+        ];
+
+        // 排序函数：提取文件名中的首个数字
+        function getSortNumber(filename) {
+            const match = filename.match(/^(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+        }
+
+        // 生成GIF卡片
+        function createGifCard(item) {
+            const card = document.createElement('div');
+            card.className = 'gif-card';
+            card.innerHTML = `
+                <img src="gifs/${item.file}" alt="${item.title}">
+                <div class="gif-info">
+                    <div class="gif-number">交互节点 ${getSortNumber(item.file)}</div>
+                    <div class="gif-title">${item.title}</div>
+                </div>
+            `;
+            return card;
+        }
+
+        // 初始化加载
+        window.onload = () => {
+            const container = document.getElementById('gifContainer');
+            
+            // 按数字排序
+            const sortedGifs = gifFiles.sort((a, b) => 
+                getSortNumber(a.file) - getSortNumber(b.file)
+            );
+
+            // 批量创建卡片
+            sortedGifs.forEach(item => {
+                container.appendChild(createGifCard(item));
+            });
+        }
+    </script>
+</body>
+</html>
