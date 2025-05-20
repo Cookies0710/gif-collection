@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能座舱交互全流程演示</title>
+    <title>智能座舱交互系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css ">
     <style>
-        /* 基础样式 */
+        :root {
+            --primary: #007AFF;
+            --secondary: #00C7FF;
+            --bg-dark: #0d0d0d;
+            --bg-light: #1a1a1a;
+            --text: #fff;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,167 +21,555 @@
             font-family: "Microsoft YaHei", sans-serif;
         }
 
-        body {
-            background: #0a0a0a;
-            color: #fff;
+        html {
+            scroll-behavior: smooth;
         }
 
-        /* 封面页 */
-        .hero {
+        body {
+            background: var(--bg-dark);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* 首页 */
+        #home-page {
+            width: 100vw;
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(ellipse at center, #001529 0%, #000 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: radial-gradient(circle at 50% 30%, 
+                rgba(0, 122, 255, 0.1) 0%, 
+                rgba(0, 0, 0, 0) 60%),
+            linear-gradient(45deg, #000 0%, #0a0a2e 100%);
+            scroll-snap-align: start;
+            position: relative;
         }
 
-        .title {
-            font-size: 2.8rem;
+        .main-title {
+            font-size: 3rem;
             text-align: center;
             margin-bottom: 2rem;
-            background: linear-gradient(45deg, #007AFF, #00C7FF);
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* 瀑布流容器 */
-        .grid-container {
-            columns: 4 300px;
-            column-gap: 1.5rem;
-            padding: 2rem;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        /* GIF卡片 */
-        .gif-card {
-            break-inside: avoid;
-            margin-bottom: 1.5rem;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #1a1a1a;
-            transition: transform 0.3s;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .gif-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .gif-card::before {
-            content: "";
+        .scroll-indicator {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            transition: border-color 0.3s;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
         }
 
-        .gif-card:hover::before {
-            border-color: #007AFF;
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: particleFlow 2s infinite;
         }
 
-        .gif-card img {
-            width: 100%;
-            height: auto;
-            border-bottom: 2px solid #007AFF;
+        @keyframes particleFlow {
+            0% { transform: translateY(0); opacity: 0; }
+            30% { opacity: 1; }
+            100% { transform: translateY(40px); opacity: 0; }
         }
 
-        .gif-info {
+        .arrow {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary);
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(45deg); }
+            50% { transform: translateY(10px) rotate(45deg); }
+        }
+
+        /* 导航系统 */
+        .nav-panel {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: rgba(13, 13, 13, 0.95);
             padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(5px);
         }
 
-        .gif-number {
-            color: #007AFF;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .nav-panel.visible {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
         }
 
-        .gif-title {
-            font-size: 1.1rem;
-            line-height: 1.4;
+        .nav-panel.collapsed {
+            width: 60px;
+            padding: 0.5rem;
         }
 
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .title {
-                font-size: 2rem;
-                padding: 0 1rem;
-            }
-            
-            .grid-container {
-                columns: 2;
-                padding: 1rem;
-            }
+        .nav-panel.collapsed .nav-item span {
+            opacity: 0;
+            width: 0;
+            margin: 0;
+            transition: all 0.3s;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            background: rgba(0, 122, 255, 0.1);
+            transform: translateX(10px);
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 122, 255, 0.2);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        /* 内容页 */
+        .content-page {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gif-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s;
+        }
+
+        .gif-viewer {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transition: all 0.5s;
+            cursor: pointer;
+        }
+
+        /* 详情页文字区域 */
+        .text-panel {
+            position: absolute;
+            left: 50%;
+            width: 40%;
+            height: 100%;
+            padding: 5rem 7rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(30%);
+            transition: all 0.5s 0.2s, margin-left 0.5s;
+            gap: 3rem;
+            text-align: center;
+        }
+
+        .text-panel h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .text-panel p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.9);
+            max-width: 600px;
+            padding: 0 2rem;
+        }
+
+        /* 激活状态 */
+        .detail-active .content-wrapper {
+            transform: translateX(-20%);
+        }
+
+        .detail-active .gif-viewer {
+            transform: scale(0.95) translateX(-8%);
+        }
+
+        .detail-active .text-panel {
+            opacity: 1;
+            transform: translateX(50%);
+            margin-left: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 100;
+        }
+
+        .detail-active .close-btn {
+            opacity: 1;
+        }
+
+        /* 其他样式 */
+        .scroll-container {
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            height: 100vh;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s;
         }
     </style>
 </head>
 <body>
-    <!-- 封面页 -->
-    <section class="hero">
-        <h1 class="title">基于感性工学和语音驱动的<br>智慧座舱交互图形设计</h1>
-    </section>
+    <div class="progress-bar">
+        <div class="progress"></div>
+    </div>
 
-    <!-- 瀑布流展示区 -->
-    <main class="grid-container" id="gifContainer"></main>
+    <nav class="nav-panel" id="navPanel"></nav>
+
+    <main class="scroll-container" id="scrollContainer">
+        <section id="home-page">
+            <h1 class="main-title">基于感性工学和语音驱动的<br>智慧座舱交互图形设计</h1>
+            <div class="scroll-indicator">
+                <div class="particles">
+                    <div class="particle" style="left: 20%; animation-delay: 0s"></div>
+                    <div class="particle" style="left: 35%; animation-delay: 0.2s"></div>
+                    <div class="particle" style="left: 50%; animation-delay: 0.4s"></div>
+                    <div class="particle" style="left: 65%; animation-delay: 0.6s"></div>
+                    <div class="particle" style="left: 80%; animation-delay: 0.8s"></div>
+                </div>
+                <div class="arrow"></div>
+            </div>
+        </section>
+    </main>
 
     <script>
-        // GIF数据配置（按实际文件名修改）
-        const gifFiles = [
-            { file: "1.gif", title: "主动视觉引导" },
-            { file: "2.gif", title: "疲劳检测模式" },
-            { file: "3-4.gif", title: "语音唤醒状态" },
-            { file: "5-6.gif", title: "决策思考状态" },
-            { file: "7-10.gif", title: "方案生成展示" },
-            { file: "11.gif", title: "深度休息模式" },
-            { file: "12-14.gif", title: "AR导航系统" },
-            { file: "15-17.gif", title: "媒体中心控制" },
-            { file: "18-19.gif", title: "手势控制系统" },
-            { file: "20-23.gif", title: "天气感知交互" },
-            { file: "24-27.gif", title: "环境光自适应" },
-            { file: "28-31.gif", title: "表情反馈系统" }
+        // ===================== 配置区域 ===================== //
+        const contentData = [
+        { 
+                id: 1,  
+                gif: '1.gif',
+                title: '主视觉形象',  
+                description: '主形象采用柔性科技风格的拟人化图形设计，平衡技术感与情感温度，\n通过层次化的形象构建、系统化的动态效果和情感化的色彩系统，\n满足用户对现代感、人性化和活泼度的综合需求',  
+                icon: 'smile' 
+            },
+            { 
+                id: 2,  
+                gif: '最终设计_图-分层.png',
+                title: '主形象三层结构示意',
+                description: '核心层——采用向量化线条表达图形符号，保持高识别度与可辨识性，是情感表达和状态变化的中心；\n中间层响应层——根据不同交互状态动态调整视觉表现，增强实时反馈的可感知性;\n外围层为光晕层——最外围的环境层，通过柔和的光效处理创造空间深度与立体感，形成“悬浮”的视觉效果。',
+                icon: 'laugh' 
+            },
+            { 
+                id: 3,  
+                gif: '最终设计_图-02.png',
+                title: '基础状态转换循环',
+                description: '休眠态——以呼吸式“Z”字符号象征静默待机，降低用户被监视感；\n唤醒态——光晕渐亮与核心波动模拟生物苏醒，建立情感连接；\n聆听态——主体15°倾斜并扶耳，通过拟人姿态强化“被倾听感”；\n思考态——核心旋转与托腮表情，将数据处理转化为可理解的“思考”隐喻；\n反馈态——差异化表情（点赞/困惑）区分结果类型，传递明确信号与情感共鸣;\n五态通过自然动态衔接形成闭环，以拟人化视觉语言同步传递系统状态与情感温度，兼顾功能清晰度与交互生命力。',
+                icon: 'laugh' 
+            },
+            { 
+                id: 4,  
+                gif: '最终设计_图-03.png',
+                title: '色彩构成',
+                description: '科技蓝传达科技感与可靠性，粉色则传递关怀性与亲和力，两者融合创造“温暖科技”的品牌定位；\n辅助色以降低色彩饱和度和增加蓝光滤除，有效降低长时间使用的视觉疲劳和认知负担；\n强调色创造视觉层次和情感焦点，提升系统的活力感知和交互响应感。',
+                icon: 'grin' 
+            },
+            { 
+                id: 5,  
+                gif: '2.gif',
+                title: '唤醒状态反馈',
+                description: '采用了“苏醒隐喻”的动态设计；\n呈现出人性化特征\n通过“由休息到工作”的转场动效建立可用性感知.',
+                icon: 'meh' 
+            },
+            { 
+                id: 6,  
+                gif: '3–4.gif',
+                title: '聆听状态反馈',
+                description: '方案一——拟人化的表达方式，将人机交互聆听过程处理为人际交流中的相同方式，\n符合人们自然倾向于赋予技术产品社会属性的认知特征；\n方案二——功能性抽象化设计的方式，通过实时响应的声波可视化传达系统的聆听状态。',
+                icon: 'assistive-listening-systems' 
+            },
+            { 
+                id: 7,  
+                gif: '5-6.gif',
+                title: '思考状态反馈',
+                description: '方案一——拟人化表达方式，将系统的信息处理过程转化为人类思考行为的视觉隐喻，\n通过熟悉的社会化行为模式增强抽象过程的可理解性;\n方案二——常规的过程可视化表达方式，通过抽象的加载动画表达系统的处理状态，\n直观展示信息处理的动态进程。',
+                icon: 'meh' 
+            },
+            { 
+                id: 8,  
+                gif: '7-10.gif',
+                title: '响应状态反馈',
+                description: '成功时，笑脸点赞与科技橙蓝光晕传递愉悦；\n失败时，缓降动效与柔冷色调温和示歉。\n以动态图形为语言，拟人交互为纽带，让技术有温度、沟通更透明，重塑AI的「生命力」与「共情力」。',
+                icon: 'surprise' 
+            },
+            { 
+                id: 9,  
+                gif: '11.gif',
+                title: '休眠状态反馈',
+                description: '「隐于无形，静候指令」\n微缩形态融入背景，呼吸眼动与“Z”符轻现维系存在感；\n闭合眼睑明示非监听状态，以低存在感设计平衡驾驶专注与系统待机可靠性，\n让智能守护无声却可信。',
+                icon: 'eye-slash' 
+            },
+            { 
+                id: 10,  
+                gif: '12-14.gif',
+                title: '导航场景适配',
+                description: '「导航三步曲，智趣随行」\n起点灵动寻路——语音助手化身探索者，拟人张望+路线动画双效协同，让搜索过程透明可视；\n途中导游指引——切换向导形态，持续提供方向提示与情感陪伴；\n终点欢庆闭环——抵达时雀跃表情触发成就仪式感。\n以拟人化状态切换串联导航全流程，用最简视觉语言实现高效指引，让智能出行兼备清晰度与温度感。',
+                icon: 'street-view' 
+            },
+            { 
+                id: 11,  
+                gif: '15-17.gif',
+                title: '媒体播放场景适配',
+                description: '「律动随享，智能知音」\n播放时化身音乐家——核心随节拍律动，传递沉浸式视听体验；\n媒体类型智能变身——音乐/新闻自动切换演奏/播报角色，视觉语言精准匹配内容属性；\n安全模式动态降噪——高速行驶时自动简化动效，确保驾驶专注；后台轻量化界面维持功能可及性。\n以情感化律动建立共享音乐时刻，用角色映射强化场景认知，让媒体交互既生动活泼又安全可控，打造有温度的智能座舱娱乐生态。',
+                icon: 'compact-disc' 
+            },
+            { 
+                id: 12,  
+                gif: '18-19.gif',
+                title: '车辆控制场景适配',
+                description: '「安心调校，精准可见」\n指令识别时凝神检查——语音助手化身严谨技师，以观察表情确认指令接收；\n操作完成时三阶反馈：确认点头+参数高亮+情境特效（如冷暖风流动），构建完整控制闭环。\n通过表情符号与功能状态的直观映射，在保障操作精确性的同时，用视觉语言强化系统可靠性与用户安全感，让车辆设置既专业可信又充满人性化关怀。',
+                icon: 'wrench' 
+            },
+            { 
+                id: 13,  
+                gif: '20-23.gif',
+                title: '智能助手场景适配',
+                description: '「智问慧答，动态知心」\n检索时化身思考者——专注表情+进度动效同步反馈，天气“观天”百科“翻书”动作暗喻查询类型；\n结果呈现情境演绎——晴雨表情灵动切换、百科博学姿态加持，让信息传递有温度；\n遇阻时眉梢低垂致歉，同步推荐替代方案，以拟人化情感弥合信息鸿沟。\n通过动态角色与场景化反馈，将枯燥问答转化为有生命力的对话，既消解等待焦虑，更维系用户探索欲，打造可信赖的智能交互伙伴。',
+                icon: 'lightbulb' 
+            },
+            { 
+                id: 14,  
+                gif: '24-27.gif',
+                title: '基础表情库',
+                description: '「微表情，大共情」\n6大基础表情（愉悦/专注/疑惑等）通过形态光效精准映射情境：夸赞笑颜、指令思考、遇阻歉意。\n以安全动态美学构建人机情感纽带，让每帧反馈都流淌恰到好处的理解与温度。',
+                icon: 'smile-beam' 
+            },
+            { 
+                id: 15,  
+                gif: '28-31.gif',
+                title: '情感化仪式',
+                description: '「仪式感交互，记忆点升温」\n晨迎雨暖——启动时环境智能问候；\n旅途焕新——通勤/出游切换主题模式；\n暮别心温——熄火前挥手比心留温存。\n用场景化仪式锚定关键节点，以动态美学浇筑品牌情感印记，让每次启停都成为有温度的记忆触点。',
+                icon: 'heartbeat' 
+            },
+            { 
+                id: 16,  
+                gif: '主界面-休眠.png',
+                title: '主界面-休眠状态',
+                description: '「隐息守界，无声伴行」\n微缩形态低融背景，呼吸眼睑+循环Z符维系存在；\n闭合眼睑明示非监听，以静谧美学平衡待机可靠与驾驶专注。',
+                icon: 'moon' 
+            },
+            { 
+                id: 17,  
+                gif: '主界面-待机.png',
+                title: '主界面-待机状态',
+                description: '「光晕轻启，伺机而应」主体苏醒波动+渐亮光晕，核心预备态低频律动，\n保持视觉低扰性，确保指令零延迟响应。',
+                icon: 'sun-o' 
+            },
+            { 
+                id: 18,  
+                gif: '卡片信息.png',
+                title: '百科问答-卡片信息',
+                description: '「翻书解惑，博学有范」指尖划动如翻阅典籍，结果呈现时化身智者微倾，\n知识光点流转间，枯燥问答升华为探索仪式。',
+                icon: 'book' 
+            },
+            { 
+                id: 19,  
+                gif: '卡片信息2.png',
+                title: '天气-卡片信息',
+                description: '「观天知象，灵动应景」模拟仰首观云姿态，晴则笑颜映阳，雨则凝眸伴滴，\n用动态表情传递环境感知，让天气数据跃然眼前。',
+                icon: 'cloud' 
+            },
         ];
 
-        // 排序函数：提取文件名中的首个数字
-        function getSortNumber(filename) {
-            const match = filename.match(/^(\d+)/);
-            return match ? parseInt(match[1]) : 0;
+        // ===================== 核心功能 ===================== //
+        function encodeFilename(filename) {
+            return 'gifs/' + encodeURIComponent(filename).replace(/%E2%80%93/g, '-');
         }
 
-        // 生成GIF卡片
-        function createGifCard(item) {
-            const card = document.createElement('div');
-            card.className = 'gif-card';
-            card.innerHTML = `
-                <img src="gifs/${item.file}" alt="${item.title}">
-                <div class="gif-info">
-                    <div class="gif-number">交互节点 ${getSortNumber(item.file)}</div>
-                    <div class="gif-title">${item.title}</div>
-                </div>
-            `;
-            return card;
+        function initSystem() {
+            const container = document.getElementById('scrollContainer');
+            const navPanel = document.getElementById('navPanel');
+
+            // 生成导航
+            contentData.forEach((item, index) => {
+                const navItem = document.createElement('div');
+                navItem.className = 'nav-item';
+                navItem.innerHTML = `
+                    <i class="nav-icon fas fa-${item.icon}"></i>
+                    <span>${item.title}</span>  <!-- 🟢 导航文字显示处 -->
+                `;
+                navItem.addEventListener('click', () => scrollTo(index + 1));
+                navPanel.appendChild(navItem);
+            });
+
+            // 生成内容页
+            contentData.forEach(item => {
+                const page = document.createElement('section');
+                page.className = 'content-page';
+                page.innerHTML = `
+                    <div class="content-wrapper">
+                        <div class="gif-container">
+                            <img src="${encodeFilename(item.gif)}" class="gif-viewer">
+                        </div>
+                        <div class="text-panel">
+                            <h2>${item.title}</h2>     <!-- 🔵 详情页标题 -->
+                            <p>${item.description.replace(/\n/g, '<br>')}</p>  <!-- 🔵 详情页正文 -->
+                        </div>
+                    </div>
+                    <button class="close-btn">&times;</button>
+                `;
+
+                const img = page.querySelector('img');
+                img.addEventListener('click', () => showDetail(page));
+                page.querySelector('.close-btn').addEventListener('click', () => closeDetail(page));
+                
+                container.appendChild(page);
+            });
+
+            // 滚动监听
+            let lastScroll = 0;
+            container.addEventListener('scroll', () => {
+                const currentScroll = container.scrollTop;
+                if (Math.abs(currentScroll - lastScroll) > 50) {
+                    updateNavigation(currentScroll);
+                    updateProgress();
+                    lastScroll = currentScroll;
+                }
+            });
+
+            updateNavigation(0);
         }
 
-        // 初始化加载
-        window.onload = () => {
-            const container = document.getElementById('gifContainer');
-            
-            // 按数字排序
-            const sortedGifs = gifFiles.sort((a, b) => 
-                getSortNumber(a.file) - getSortNumber(b.file)
-            );
+        function showDetail(page) {
+            const navPanel = document.getElementById('navPanel');
+            navPanel.classList.add('collapsed');
+            page.classList.add('detail-active');
+        }
 
-            // 批量创建卡片
-            sortedGifs.forEach(item => {
-                container.appendChild(createGifCard(item));
+        function closeDetail(page) {
+            const navPanel = document.getElementById('navPanel');
+            navPanel.classList.remove('collapsed');
+            page.classList.remove('detail-active');
+        }
+
+        function updateNavigation(scrollPos) {
+            const container = document.getElementById('scrollContainer');
+            const sections = document.querySelectorAll('section');
+            const navItems = document.querySelectorAll('.nav-item');
+            const navPanel = document.getElementById('navPanel');
+            const progressBar = document.querySelector('.progress-bar');
+
+            const showNav = scrollPos > window.innerHeight * 0.3;
+            navPanel.classList.toggle('visible', showNav);
+            progressBar.style.opacity = showNav ? 1 : 0;
+
+            let currentActiveIndex = 0;
+            sections.forEach((section, index) => {
+                const sectionTop = section.offsetTop;
+                const sectionBottom = sectionTop + section.offsetHeight;
+                if (scrollPos >= sectionTop - window.innerHeight/3 && 
+                    scrollPos < sectionBottom - window.innerHeight/3) {
+                    currentActiveIndex = index;
+                }
+            });
+
+            navItems.forEach((item, index) => {
+                item.classList.toggle('active', index === currentActiveIndex - 1);
             });
         }
+
+        function updateProgress() {
+            const container = document.getElementById('scrollContainer');
+            const progress = (container.scrollTop / (container.scrollHeight - container.clientHeight)) * 100;
+            document.querySelector('.progress').style.width = `${progress}%`;
+        }
+
+        function scrollTo(index) {
+            const container = document.getElementById('scrollContainer');
+            const sections = document.querySelectorAll('section');
+            const targetSection = sections[index];
+            const targetOffset = targetSection.offsetTop + 
+                               targetSection.offsetHeight/2 - 
+                               window.innerHeight/2;
+            
+            container.scrollTo({
+                top: targetOffset,
+                behavior: 'smooth'
+            });
+        }
+
+        window.onload = initSystem;
     </script>
 </body>
 </html>
